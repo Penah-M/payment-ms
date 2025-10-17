@@ -8,6 +8,7 @@ public interface AccountService {
      AccountResponse createAccount(AccountRequest request);
      AccountResponse findById(Long id);
      AccountResponse deleteAccount(Long id);
+     void blockAccount(Long id);
 
 
 }
