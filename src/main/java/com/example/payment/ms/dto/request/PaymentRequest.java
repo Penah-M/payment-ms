@@ -1,7 +1,6 @@
 package com.example.payment.ms.dto.request;
 
 
-import com.example.payment.ms.enums.PaymentStatus;
 import com.example.payment.ms.enums.PaymentType;
 import lombok.AllArgsConstructor;
 import lombok.Data;

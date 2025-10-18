@@ -14,8 +14,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.temporal.ChronoUnit;
-
+import static java.time.temporal.ChronoUnit.MINUTES;
 import static lombok.AccessLevel.PRIVATE;
 
 @Service
@@ -35,7 +34,7 @@ public class AccountImpl implements AccountService {
         log.info("Bazaya melumat elave edildi");
         accountRepository.save(entity);
         log.info("Redise elave olundu");
-        cacheUtil.saveCache(getKey(entity.getId()), entity, 10L, ChronoUnit.MINUTES);
+        cacheUtil.saveCache(getKey(entity.getId()), entity, 10L, MINUTES);
         AccountResponse response = accountMapper.response(entity);
         log.info("Account yaradilmagi sona catdi");
         return response;
@@ -54,7 +53,7 @@ public class AccountImpl implements AccountService {
             return new NotFoundException("Bu ide sahib istifadeci tapilmadi");
         });
         log.info("Melumat cache elave olundu");
-        cacheUtil.saveCache(getKey(account.getId()), account, 10L, ChronoUnit.MINUTES);
+        cacheUtil.saveCache(getKey(account.getId()), account, 10L, MINUTES);
         AccountResponse response = accountMapper.response(account);
         log.info("Melumat teqdim olunur");
         return response;
@@ -64,7 +63,9 @@ public class AccountImpl implements AccountService {
     public AccountResponse deleteAccount(Long id) {
         AccountEntity entity = cacheUtil.getBucket(getKey(id));
         if (entity != null) {
+            log.info("Redisden oxunur");
             entity.setStatus(AccountStatus.DELETE);
+            log.info("Id-si {} olan istifadecinin statusu Delete olu ", id);
             accountRepository.save(entity);
             return accountMapper.response(entity);
         }
@@ -75,7 +76,7 @@ public class AccountImpl implements AccountService {
         account.setStatus(AccountStatus.DELETE);
         accountRepository.save(account);
         log.info("Cache elave olundu..");
-        cacheUtil.saveCache(getKey(id), account, 10L, ChronoUnit.MINUTES);
+        cacheUtil.saveCache(getKey(id), account, 10L, MINUTES);
         AccountResponse response = accountMapper.response(account);
 
         return response;
@@ -87,11 +88,11 @@ public class AccountImpl implements AccountService {
         if (account != null && account.getStatus().equals(AccountStatus.ACTIVE)) {
             log.info("Redisden oxunur");
             account.setStatus(AccountStatus.BLOCK);
+            log.info("Hesab bloklandi: id={}, name={}", id, account.getName());
             accountRepository.save(account);
         }
 
-
-    AccountEntity entity=accountRepository.findById(id).orElseThrow(() -> {
+        AccountEntity entity = accountRepository.findById(id).orElseThrow(() -> {
             log.error("Bele id yoxdur");
             return new NotFoundException("Bele id yoxdur");
         });
@@ -101,6 +102,6 @@ public class AccountImpl implements AccountService {
 
 
     private String getKey(Long id) {
-        return "RESTAURANT:" + id;
+        return "ACCOUNT:" + id;
     }
 }

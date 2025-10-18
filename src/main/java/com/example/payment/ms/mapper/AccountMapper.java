@@ -6,6 +6,8 @@ import com.example.payment.ms.dto.response.AccountResponse;
 import com.example.payment.ms.enums.AccountStatus;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 public class AccountMapper {
     public AccountEntity entity(AccountRequest request){
@@ -20,7 +22,7 @@ public class AccountMapper {
         return AccountResponse.builder()
                 .balance(entity.getBalance())
                 .id(entity.getId())
-                .createdAt(entity.getCreatedAt())
+                .createdAt(LocalDateTime.now())
                 .name(entity.getName())
                 .status(entity.getStatus())
                 .updatedAt(entity.getUpdatedAt())
